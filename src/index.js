@@ -2,40 +2,35 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 
-function Square(props) {
+const Square = (props) => {
   return (
     <button className="square" onClick={props.onClick}>
       {props.value}
     </button>
   );
 }
-  
-class Board extends React.Component
-{
-  renderSquare(i)
-  {
+
+const Board = (props) => {
+  const renderSquare = (i) => {
     return (
       <Square
-        value={this.props.squares[i]}
-        onClick={() => this.props.onClick(i)}
+        value={props.squares[i]}
+        onClick={() => props.onClick(i)}
       />
     );
   }
-  
-  render()
-  {
-    return (
-      <div>
-        {
-          [0, 1, 2].map(i => (
-            <div className="board-row">
-              {[0, 1, 2].map(j => this.renderSquare(3*i + j))}
-            </div>
-          ))
-        }
-      </div>
-    )
-  }
+
+  return (
+    <div>
+      {
+        [0, 1, 2].map(i => (
+          <div className="board-row">
+            {[0, 1, 2].map(j => renderSquare(3*i + j))}
+          </div>
+        ))
+      }
+    </div>
+  );
 }
 
 class Game extends React.Component
@@ -126,8 +121,7 @@ class Game extends React.Component
   }
 }
 
-function calculateWinner(squares)
-{
+const calculateWinner = (squares) => {
   //All possible patterns to win.
   const lines = [
     [0, 1, 2],
