@@ -155,5 +155,7 @@ const calculateWinner = (squares) => {
   
 // ========================================
 
+console.log("These violent delights have violent ends.");
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<Game />);
