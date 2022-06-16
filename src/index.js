@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 
@@ -33,92 +33,77 @@ const Board = (props) => {
   );
 }
 
-class Game extends React.Component
-{
-  constructor(props)
-  {
-    super(props);
-    this.state = {
-      //history array:
-      history: [
-        {squares: Array(9).fill(null)},
-      ],
-      stepNumber: 0,
-      xNext: true,
+const Game = () => {
+  //Declare state variables with hooks.
+  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const [stepNum, setStepNum] = useState(0);
+  const [xNext, setXNext]     = useState(false);
+
+  //Determine variables dependent on state variables.
+  const current = history[stepNum];
+  const winner = calculateWinner(current);
+  let status;
+  if(!winner) {
+    //If calculate winner is null (no winner declared.)
+    status = 'Next turn: ' + (xNext?'X.':'O.');
+  }
+  else {
+    //If winner is not null
+    status = 'Winner: ' + winner +'!';
+  }
+
+  //Helper functions (need to be declared before they can be used.)
+  const jumpTo = (step) => {
+    setXNext((step%2)===0);
+    setStepNum(step);
+  }
+
+  const handleClick = (i) => {
+    const historySlice = history.slice(0, stepNum + 1);     //history array up to the current step num.
+    const current = historySlice[historySlice.length - 1];  //last element of historySlice.
+
+    //If winner not declared, and square is null (not filled).
+    if(!(calculateWinner(current) || current[i])) {
+
+      //Set value of clicked square to current turn symbol.
+      current[i] = xNext?'X':'O';
+
+      //Updated history state with new turn.
+      setHistory(historySlice.concat([current]));
+
+      //Update stepnumber and current turn symbol.
+      setStepNum(history.length);
+      setXNext(!xNext);
     }
   }
 
-  handleClick(i)
-  {
-    const history = this.state.history.slice(0, this.state.stepNumber + 1);
-    const current = history[history.length-1];
-    const squares = current.squares.slice();
-
-    //IF NOT (winner exists OR clicked square is already filled)
-    //ie. if valid move, execute code
-    if(!(calculateWinner(squares) || squares[i]))
-    {
-      squares[i] = this.state.xNext?'X':'O';
-      this.setState({
-        history: history.concat([{
-          squares: squares
-        }]),
-        stepNumber: history.length,
-        xNext: !this.state.xNext
-      });
-    }
-  }
-
-  jumpTo(step)
-  {
-    this.setState({
-      stepNumber: step,
-      xNext: (step % 2) ===0,
-    });
-  }
-
-  render()
-  {
-    const history = this.state.history;
-    const current = history[this.state.stepNumber];
-    const winner = calculateWinner(current.squares);
-
-    const moves = history.map((step, move) => {
-      const desc = move ?
-        'Go to move #' + move + '.' :
-        'Go to game start.';
-      return (
-        <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
-        </li>
-      );
-    });
-
-    let status;
-    if(winner)
-    {
-      status = 'Winner: ' + winner + '!';
-    }
-    else
-    {
-      status = 'Next turn: ' + (this.state.xNext?'X.':'O.');
-    }
-
+  //Create moves list.
+  //Map function automatically uses array index for second arg. First arg is irrelevant.
+  const moves = history.map((bananas, index) => {
+    const desc = index ?
+      'Go to move #' + index + '.' :
+      'Go to game start.';
     return (
-      <div className="game">
+      <li key={index}>
+        <button onClick={() => jumpTo(index)}>{desc}</button>
+      </li>
+    );
+  });
+  
+  return (
+    <div className="game">
         <div className="game-board">
           <Board
-            squares={current.squares}
-            onClick={(i) => this.handleClick(i)}
+            squares={current}
+            onClick={(i) => handleClick(i)}
           />
         </div>
         <div className="game-info">
           <div>{status}</div>
           <ol>{moves}</ol>
         </div>
-      </div>
-    );
-  }
+    </div>
+  );
 }
 
 const calculateWinner = (squares) => {
@@ -135,27 +120,24 @@ const calculateWinner = (squares) => {
   ]
 
   //For each possible winning pattern.
-  for(let i = 0; i<lines.length; i++)
-  {
+  for(let i = 0; i<lines.length; i++) {
     //Let [a,b,c] be one winning pattern.
     const [a, b, c] = lines[i];
 
     //Check if pattern has been one (a, b, c all have same value.)
     //IF a is not null AND a=b AND a=c
-    if(squares[a] && squares[a] === squares[b] && squares[a] === squares[c])
-    {
+    if(squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
       //return value of winning player.
       return squares[a]
     }
-
   }
+
+  console.log("Here!");
 
   return null;
 }
   
 // ========================================
-
-console.log("These violent delights have violent ends.");
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<Game />);
