@@ -59,18 +59,17 @@ const Game = () => {
   }
 
   const handleClick = (i) => {
-    const historySlice = history.slice(0, stepNum + 1);     //history array up to the current step num.
-    const current = historySlice[historySlice.length - 1];  //last element of historySlice.
+    const historySlice = history.slice(0, stepNum + 1);                   //turn history up to current turn.
+    const current = historySlice[historySlice.length - 1].map((x) => x);  //square configuration of current turn.
 
     //If winner not declared, and square is null (not filled).
     if(!(calculateWinner(current) || current[i])) {
-    //if(!current[i]) {
-
       //Set value of clicked square to current turn symbol.
       current[i] = xNext?'X':'O';
 
       //Updated history state with new turn.
-      setHistory(historySlice.concat([current]));
+      let newSlice = historySlice.concat([current]);
+      setHistory(newSlice);
 
       //Update stepnumber and current turn symbol.
       setStepNum(history.length);
@@ -92,6 +91,7 @@ const Game = () => {
     );
   });
 
+  console.log("Current turn: " + stepNum);
   logHistory(history);
   
   return (
@@ -141,7 +141,6 @@ const calculateWinner = (squares) => {
 
 //Helper function for debugging.
 const logHistory = (history) => { 
-  //Implementation with reduce function.
   const completeMessage = history.reduce((messageRows, squares, turnNum) => {
     messageRows += "Turn " + turnNum + ":\t";
     messageRows += squares.reduce((messageSquares, square) => {
