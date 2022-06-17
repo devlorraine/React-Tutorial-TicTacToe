@@ -64,6 +64,7 @@ const Game = () => {
 
     //If winner not declared, and square is null (not filled).
     if(!(calculateWinner(current) || current[i])) {
+    //if(!current[i]) {
 
       //Set value of clicked square to current turn symbol.
       current[i] = xNext?'X':'O';
@@ -131,8 +132,6 @@ const calculateWinner = (squares) => {
       return squares[a]
     }
   }
-
-  console.log("Here!");
 
   return null;
 }
