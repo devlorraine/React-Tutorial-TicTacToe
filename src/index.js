@@ -76,6 +76,7 @@ const Game = () => {
       setStepNum(history.length);
       setXNext(!xNext);
     }
+
   }
 
   //Create moves list.
@@ -90,6 +91,8 @@ const Game = () => {
       </li>
     );
   });
+
+  logHistory(history);
   
   return (
     <div className="game">
@@ -134,6 +137,22 @@ const calculateWinner = (squares) => {
   }
 
   return null;
+}
+
+//Helper function for debugging.
+const logHistory = (history) => { 
+  //Implementation with reduce function.
+  const completeMessage = history.reduce((messageRows, squares, turnNum) => {
+    messageRows += "Turn " + turnNum + ":\t";
+    messageRows += squares.reduce((messageSquares, square) => {
+      messageSquares += square?(square + ","):"_,";
+      return messageSquares;
+    }, "");
+    messageRows += "\n";
+    return messageRows;
+  }, "");
+
+  console.log(completeMessage);
 }
   
 // ========================================
