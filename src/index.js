@@ -35,13 +35,17 @@ const Board = (props) => {
 
 const Game = () => {
   //Declare state variables with hooks.
-  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const [history, setHistory] = useState([
+    {
+      squares: Array(9).fill(null)
+    }
+  ]);
   const [stepNum, setStepNum] = useState(0);
   const [xNext, setXNext]     = useState(false);
 
   //Determine variables dependent on state variables.
   const current = history[stepNum];
-  const winner = calculateWinner(current);
+  const winner = calculateWinner(current.squares);
   let status;
   if(!winner) {
     //If calculate winner is null (no winner declared.)
@@ -60,19 +64,19 @@ const Game = () => {
 
   const handleClick = (i) => {
     const historySlice = history.slice(0, stepNum + 1);           //turn history up to current turn.
-    const current = [...historySlice[historySlice.length - 1]];   //Square configuration of current turn.
+    const currentSquares = [...historySlice[historySlice.length - 1].squares];   //Square configuration of current turn
     /*
     Note spread operator "..." makes copy of array data without copying array reference.
     Current is thus a new object.
     */
 
     //If winner not declared, and square is null (not filled).
-    if(!(calculateWinner(current) || current[i])) {
+    if(!(calculateWinner(currentSquares) || currentSquares[i])) {
       //Set value of clicked square to current turn symbol.
-      current[i] = xNext?'X':'O';
+      currentSquares[i] = xNext?'X':'O';
 
       //Updated history state with new turn.
-      setHistory(historySlice.concat([current]));
+      setHistory(historySlice.concat({squares: currentSquares}));
 
       //Increment stepnumber and current turn symbol.
       setXNext(!xNext);
@@ -102,7 +106,7 @@ const Game = () => {
     <div className="game">
         <div className="game-board">
           <Board
-            squares={current}
+            squares={current.squares}
             onClick={(i) => handleClick(i)}
           />
         </div>
@@ -115,8 +119,6 @@ const Game = () => {
 }
 
 const calculateWinner = (squares) => {
-  //return false;
-
   //All possible patterns to win.
   const lines = [
     [0, 1, 2],
@@ -147,9 +149,9 @@ const calculateWinner = (squares) => {
 
 //Helper function for debugging.
 const logHistory = (history) => { 
-  const completeMessage = history.reduce((messageRows, squares, turnNum) => {
+  const completeMessage = history.reduce((messageRows, turnObject, turnNum) => {
     messageRows += "Turn " + turnNum + ":\t";
-    messageRows += squares.reduce((messageSquares, square) => {
+    messageRows += turnObject.squares.reduce((messageSquares, square) => {
       messageSquares += square?(square + ","):"_,";
       return messageSquares;
     }, "");
