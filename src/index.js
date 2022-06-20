@@ -59,8 +59,12 @@ const Game = () => {
   }
 
   const handleClick = (i) => {
-    const historySlice = history.slice(0, stepNum + 1);                   //turn history up to current turn.
-    const current = historySlice[historySlice.length - 1].map((x) => x);  //square configuration of current turn.
+    const historySlice = history.slice(0, stepNum + 1);           //turn history up to current turn.
+    const current = [...historySlice[historySlice.length - 1]];   //Square configuration of current turn.
+    /*
+    Note spread operator "..." makes copy of array data without copying array reference.
+    Current is thus a new object.
+    */
 
     //If winner not declared, and square is null (not filled).
     if(!(calculateWinner(current) || current[i])) {
@@ -68,12 +72,11 @@ const Game = () => {
       current[i] = xNext?'X':'O';
 
       //Updated history state with new turn.
-      let newSlice = historySlice.concat([current]);
-      setHistory(newSlice);
+      setHistory(historySlice.concat([current]));
 
-      //Update stepnumber and current turn symbol.
-      setStepNum(history.length);
+      //Increment stepnumber and current turn symbol.
       setXNext(!xNext);
+      setStepNum(stepNum + 1);
     }
 
   }
@@ -90,10 +93,11 @@ const Game = () => {
       </li>
     );
   });
-
+  
+  //Log turn number and history for debugging.
   console.log("Current turn: " + stepNum);
   logHistory(history);
-  
+
   return (
     <div className="game">
         <div className="game-board">
@@ -111,6 +115,8 @@ const Game = () => {
 }
 
 const calculateWinner = (squares) => {
+  //return false;
+
   //All possible patterns to win.
   const lines = [
     [0, 1, 2],
