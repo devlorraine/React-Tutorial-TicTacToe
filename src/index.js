@@ -37,7 +37,7 @@ const Game = () => {
   //Declare state variables with hooks.
   const [history, setHistory] = useState([
     {
-      squares: Array(9).fill(null),   //Current board state: array of nine elements 'X', 'O' or null.
+      squares:  Array(9).fill(null),   //Current board state: array of nine elements 'X', 'O' or null.
       lastMove: null                  //Index (0-8) of last move made.
     }
   ]);
@@ -46,30 +46,24 @@ const Game = () => {
 
   //Determine variables dependent on state variables.
   const current = history[stepNum];
-  const winner = calculateWinner(current.squares);
-  let status;
-  if(!winner) {
-    //If calculate winner is null (no winner declared.)
-    status = `Next turn: ${xNext?'X.':'O.'}`;
-  }
-  else {
-    //If winner is not null
-    status = `Winner: ${winner}!`;
-  }
+  const winner  = calculateWinner(current.squares);
+  const status  = winner ?
+    `Winner: ${winner}!` :
+    `Next turn: ${xNext?'X.':'O.'}`;
 
   //Helper functions (need to be declared before they can be used.)
   const jumpTo = (step) => {
     console.log(
       `Jumping to step ${step}`,
-      `\nSetting xNext to ${(step%2)===0}`
+      `\nSetting xNext to ${!(step%2===0)}`
     );
-    setXNext(!(step%2)===0);
+    setXNext(!(step%2===0));
     setStepNum(step);
   }
 
   const handleClick = (i) => {
-    const historySlice = history.slice(0, stepNum + 1);           //turn history up to current turn.
-    const currentSquares = [...historySlice[historySlice.length - 1].squares];   //Square configuration of current turn
+    const historySlice    = history.slice(0, stepNum + 1);           //turn history up to current turn.
+    const currentSquares  = [...historySlice[historySlice.length - 1].squares];   //Square configuration of current turn
     /*
     Note spread operator "..." makes copy of array data without copying array reference.
     Current is thus a new object.
@@ -97,7 +91,7 @@ const Game = () => {
   //Create moves list.
   //Map function automatically uses array index for second arg. First arg is irrelevant.
   const moves = history.map((turnObject, index) => {
-    const player  = ((index%2)===0)?'X':'O';
+    const player  = (index%2===0)?'X':'O';
     const row     = Math.floor(turnObject.lastMove/3);
     const col     = turnObject.lastMove%3;
     const desc    = index > 0 ?
@@ -147,6 +141,7 @@ const calculateWinner = (squares) => {
     [2, 4, 6],
   ]
 
+  //TODO: this can be changed to functional programming using an array.reduce function.
   //For each possible winning pattern.
   for(let i = 0; i<lines.length; i++) {
     //Let [a,b,c] be one winning pattern.
@@ -159,8 +154,8 @@ const calculateWinner = (squares) => {
       return squares[a]
     }
   }
-
-  return null;
+  
+  return null
 }
 
 //Helper function for debugging.
@@ -173,7 +168,7 @@ const logHistory = (history) => {
     }, "");
     //Add each row.
     return `${messageRows}Turn ${turnNum}:\t${messageSquares}\tLast move: ${turnObject.lastMove}\n`;
-    
+
   }, "History:\n");
 
   console.log(completeMessage);
