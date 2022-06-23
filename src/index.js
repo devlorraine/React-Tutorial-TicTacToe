@@ -37,7 +37,8 @@ const Game = () => {
   //Declare state variables with hooks.
   const [history, setHistory] = useState([
     {
-      squares: Array(9).fill(null)
+      squares: Array(9).fill(null),   //Current board state: array of nine elements 'X', 'O' or null.
+      lastMove: null                  //Index (0-8) of last move made.
     }
   ]);
   const [stepNum, setStepNum] = useState(0);
@@ -53,12 +54,14 @@ const Game = () => {
   }
   else {
     //If winner is not null
-    status = 'Winner: ' + winner +'!';
+    status = `Winner: ${winner}!`;
   }
 
   //Helper functions (need to be declared before they can be used.)
   const jumpTo = (step) => {
-    setXNext((step%2)===0);
+    console.log("Jumping to step " + step
+      + "\nSetting xNext to " + ((step%2)===0));
+    setXNext(!(step%2)===0);
     setStepNum(step);
   }
 
@@ -76,7 +79,11 @@ const Game = () => {
       currentSquares[i] = xNext?'X':'O';
 
       //Updated history state with new turn.
-      setHistory(historySlice.concat({squares: currentSquares}));
+      setHistory(historySlice.concat(
+        {
+          squares: currentSquares,
+          lastMove: i
+        }));
 
       //Increment stepnumber and current turn symbol.
       setXNext(!xNext);
@@ -87,10 +94,14 @@ const Game = () => {
 
   //Create moves list.
   //Map function automatically uses array index for second arg. First arg is irrelevant.
-  const moves = history.map((bananas, index) => {
-    const desc = index ?
-      'Go to move #' + index + '.' :
-      'Go to game start.';
+  const moves = history.map((turnObject, index) => {
+    const player  = ((index%2)===0)?'X':'O';
+    const row     = Math.floor(turnObject.lastMove/3);
+    const col     = turnObject.lastMove%3;
+    const desc    = index > 0 ?
+      `Go to move #${index}: (${player}, ${row}, ${col})` :
+      "Go to game start.";
+
     return (
       <li key={index}>
         <button onClick={() => jumpTo(index)}>{desc}</button>
@@ -99,7 +110,8 @@ const Game = () => {
   });
   
   //Log turn number and history for debugging.
-  console.log("Current turn: " + stepNum);
+  console.log("Current turn: " + stepNum
+    + "\nxNext: " + xNext);
   logHistory(history);
 
   return (
@@ -155,9 +167,9 @@ const logHistory = (history) => {
       messageSquares += square?(square + ","):"_,";
       return messageSquares;
     }, "");
-    messageRows += "\n";
+    messageRows += "\tLast move: " + turnObject.lastMove + "\n";
     return messageRows;
-  }, "");
+  }, "History:\n");
 
   console.log(completeMessage);
 }
