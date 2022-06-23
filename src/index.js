@@ -50,7 +50,7 @@ const Game = () => {
   let status;
   if(!winner) {
     //If calculate winner is null (no winner declared.)
-    status = 'Next turn: ' + (xNext?'X.':'O.');
+    status = `Next turn: ${xNext?'X.':'O.'}`;
   }
   else {
     //If winner is not null
@@ -59,8 +59,10 @@ const Game = () => {
 
   //Helper functions (need to be declared before they can be used.)
   const jumpTo = (step) => {
-    console.log("Jumping to step " + step
-      + "\nSetting xNext to " + ((step%2)===0));
+    console.log(
+      `Jumping to step ${step}`,
+      `\nSetting xNext to ${(step%2)===0}`
+    );
     setXNext(!(step%2)===0);
     setStepNum(step);
   }
@@ -110,8 +112,10 @@ const Game = () => {
   });
   
   //Log turn number and history for debugging.
-  console.log("Current turn: " + stepNum
-    + "\nxNext: " + xNext);
+  console.log(
+    `Current turn: ${stepNum}`,
+    `\nxNext: ${xNext}`
+  );
   logHistory(history);
 
   return (
@@ -162,13 +166,14 @@ const calculateWinner = (squares) => {
 //Helper function for debugging.
 const logHistory = (history) => { 
   const completeMessage = history.reduce((messageRows, turnObject, turnNum) => {
-    messageRows += "Turn " + turnNum + ":\t";
-    messageRows += turnObject.squares.reduce((messageSquares, square) => {
-      messageSquares += square?(square + ","):"_,";
-      return messageSquares;
+    const messageSquares = turnObject.squares.reduce((messageSquares, square) => {
+      //Add symbol for each square to form row.
+      return `${messageSquares}${square ? `${square},`:`_,`}`;
+
     }, "");
-    messageRows += "\tLast move: " + turnObject.lastMove + "\n";
-    return messageRows;
+    //Add each row.
+    return `${messageRows}Turn ${turnNum}:\t${messageSquares}\tLast move: ${turnObject.lastMove}\n`;
+    
   }, "History:\n");
 
   console.log(completeMessage);
