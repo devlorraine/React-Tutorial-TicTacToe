@@ -141,21 +141,13 @@ const calculateWinner = (squares) => {
     [2, 4, 6],
   ]
 
-  //TODO: this can be changed to functional programming using an array.reduce function.
-  //For each possible winning pattern.
-  for(let i = 0; i<lines.length; i++) {
-    //Let [a,b,c] be one winning pattern.
-    const [a, b, c] = lines[i];
-
-    //Check if pattern has been one (a, b, c all have same value.)
-    //IF a is not null AND a=b AND a=c
-    if(squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      //return value of winning player.
-      return squares[a]
-    }
-  }
-  
-  return null
+  return lines.reduce((result, line) => {
+    //Return 'X' or 'O' if that char wins the line, or null otherwise.
+    debugger;
+    const [a, b, c] = line;
+    const viableWin = (!result) && (squares[a]) && (squares[a] === squares[b]) && (squares[a] === squares[c]);
+    return viableWin?squares[a]:result;
+  }, null);
 }
 
 //Helper function for debugging.
