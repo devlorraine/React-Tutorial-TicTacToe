@@ -141,13 +141,16 @@ const calculateWinner = (squares) => {
     [2, 4, 6],
   ]
 
-  return lines.reduce((result, line) => {
-    //Return 'X' or 'O' if that char wins the line, or null otherwise.
-    debugger;
+  //Return 'X' or 'O' if that char wins the line, or null otherwise.
+  const winChar =  lines.reduce((result, line) => {
+    //For each line, check if it is a winning configuration, and that winner has not already been found.
     const [a, b, c] = line;
     const viableWin = (!result) && (squares[a]) && (squares[a] === squares[b]) && (squares[a] === squares[c]);
+    //If line wins, return winning char, otherwise return previous result.
     return viableWin?squares[a]:result;
   }, null);
+
+  return winChar;
 }
 
 //Helper function for debugging.
