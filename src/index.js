@@ -41,9 +41,10 @@ const Game = () => {
       lastMove: null                  //Index (0-8) of last move made.
     }
   ]);
-  const [stepNum, setStepNum] = useState(0);      //Current turn of the game: stars at 0 and is incremented with each move.
-  const [xNext, setXNext]     = useState(false);  //Boolean indicating whether 'X' or 'O' is the next player.
-  const [wonBy, setWonBy]     = useState(null);   //'X' or 'O' if that player has won the game, otherwise null.
+  const [stepNum, setStepNum]   = useState(0);      //Current turn of the game: stars at 0 and is incremented with each move.
+  const [xNext, setXNext]       = useState(false);  //Boolean indicating whether 'X' or 'O' is the next player.
+  const [wonBy, setWonBy]       = useState(null);   //'X' or 'O' if that player has won the game, otherwise null.
+  const [orderAsc, setOrderAsc] = useState(true);   //Boolean indicating whether moves list should be displayed in ascneding or descending order.
 
   //Determine variables dependent on state variables.
   const current = history[stepNum];
@@ -54,7 +55,7 @@ const Game = () => {
     `Winner: ${winner}!` :
     `Next turn: ${xNext?'X.':'O.'}`;
 
-  //Set statevariable if new winner was detected.
+  //Set state variable if new winner was detected.
   if(winner !== wonBy) {
     setWonBy(winner);
   }
@@ -98,7 +99,6 @@ const Game = () => {
   }
 
   //Create moves list.
-  //Map function automatically uses array index for second arg. First arg is irrelevant.
   const moves = history.map((turnObject, index) => {
     const player  = (index%2===0)?'X':'O';
     const row     = Math.floor(turnObject.lastMove/3);
@@ -113,6 +113,19 @@ const Game = () => {
       </li>
     );
   });
+
+  //Create game info DOM elements.
+  const gameInfo = (
+    <div className="game-info">
+      <div>{status}</div>
+      <ol><button onClick={() => setOrderAsc(!orderAsc)}> Order by {orderAsc?"ascending.":"descending."}</button></ol>
+      {
+      orderAsc ?
+        <ol start='0'>{moves}</ol> :
+        <ol reversed start={moves.length - 1}>{moves.reverse()}</ol>
+      }
+    </div>
+  );
   
   //Log turn number and history for debugging.
   console.log(
@@ -130,10 +143,7 @@ const Game = () => {
             onClick={(i) => handleClick(i)}
           />
         </div>
-        <div className="game-info">
-          <div>{status}</div>
-          <ol>{moves}</ol>
-        </div>
+        {gameInfo}
     </div>
   );
 }
