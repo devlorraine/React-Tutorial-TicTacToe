@@ -37,19 +37,27 @@ const Game = () => {
   //Declare state variables with hooks.
   const [history, setHistory] = useState([
     {
-      squares:  Array(9).fill(null),   //Current board state: array of nine elements 'X', 'O' or null.
+      squares:  Array(9).fill(null),  //Current board state: array of nine elements 'X', 'O' or null.
       lastMove: null                  //Index (0-8) of last move made.
     }
   ]);
-  const [stepNum, setStepNum] = useState(0);
-  const [xNext, setXNext]     = useState(false);
+  const [stepNum, setStepNum] = useState(0);      //Current turn of the game: stars at 0 and is incremented with each move.
+  const [xNext, setXNext]     = useState(false);  //Boolean indicating whether 'X' or 'O' is the next player.
+  const [wonBy, setWonBy]     = useState(null);   //'X' or 'O' if that player has won the game, otherwise null.
 
   //Determine variables dependent on state variables.
   const current = history[stepNum];
-  const winner  = calculateWinner(current.squares);
+  const winner = !wonBy ?
+    calculateWinner(current.squares) :
+    wonBy;
   const status  = winner ?
     `Winner: ${winner}!` :
     `Next turn: ${xNext?'X.':'O.'}`;
+
+  //Set statevariable if new winner was detected.
+  if(winner !== wonBy) {
+    setWonBy(winner);
+  }
 
   //Helper functions (need to be declared before they can be used.)
   const jumpTo = (step) => {
@@ -59,6 +67,7 @@ const Game = () => {
     );
     setXNext(!(step%2===0));
     setStepNum(step);
+    setWonBy(null);
   }
 
   const handleClick = (i) => {
@@ -66,11 +75,11 @@ const Game = () => {
     const currentSquares  = [...historySlice[historySlice.length - 1].squares];   //Square configuration of current turn
     /*
     Note spread operator "..." makes copy of array data without copying array reference.
-    Current is thus a new object.
+    currentSquares is thus a new object.
     */
 
-    //If winner not declared, and square is null (not filled).
-    if(!(calculateWinner(currentSquares) || currentSquares[i])) {
+    //If winner not already declared, and square is null (not filled).
+    if(!(wonBy || currentSquares[i])) {
       //Set value of clicked square to current turn symbol.
       currentSquares[i] = xNext?'X':'O';
 
@@ -108,6 +117,7 @@ const Game = () => {
   //Log turn number and history for debugging.
   console.log(
     `Current turn: ${stepNum}`,
+    `\nGame won by: ${wonBy}`,
     `\nxNext: ${xNext}`
   );
   logHistory(history);
