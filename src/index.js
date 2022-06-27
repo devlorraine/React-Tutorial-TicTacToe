@@ -1,8 +1,6 @@
 /*
 * TODO:
-* 1 - Bold current move in turn list.
-* 2 - Highlight winning line when game is won.
-* 3 - Detect stalemate and display message.
+* 1 - Highlight winning line when game is won.
 */
 
 import React, {useState} from 'react';
@@ -120,7 +118,7 @@ const Game = () => {
 
     return (
       <li key={index}>
-        <button onClick={() => jumpTo(index)}>{desc}</button>
+        <button class = {index===stepNum ? "current" : "null"} onClick={() => jumpTo(index)}>{desc}</button>
       </li>
     );
   });
