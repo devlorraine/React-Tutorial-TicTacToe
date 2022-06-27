@@ -1,3 +1,10 @@
+/*
+* TODO:
+* 1 - Bold current move in turn list.
+* 2 - Highlight winning line when game is won.
+* 3 - Detect stalemate and display message.
+*/
+
 import React, {useState} from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
@@ -48,12 +55,16 @@ const Game = () => {
 
   //Determine variables dependent on state variables.
   const current = history[stepNum];
+  
   const winner = !wonBy ?
     calculateWinner(current.squares) :
     wonBy;
-  const status  = winner ?
-    `Winner: ${winner}!` :
-    `Next turn: ${xNext?'X.':'O.'}`;
+
+  const status = !winner ?
+    `Next turn: ${xNext?'X.':'O.'}` :
+    (winner==='D') ?
+      `No win possible. :(` :
+      `Winner: ${winner}!`;
 
   //Set state variable if new winner was detected.
   if(winner !== wonBy) {
@@ -148,6 +159,9 @@ const Game = () => {
   );
 }
 
+/*
+* Return 'X' or 'O' if that player wins, 'D' if game is stalemate, or null otherwise.
+*/
 const calculateWinner = (squares) => {
   //All possible patterns to win.
   const lines = [
@@ -161,19 +175,58 @@ const calculateWinner = (squares) => {
     [2, 4, 6],
   ]
 
-  //Return 'X' or 'O' if that char wins the line, or null otherwise.
-  const winChar =  lines.reduce((result, line) => {
-    //For each line, check if it is a winning configuration, and that winner has not already been found.
-    const [a, b, c] = line;
-    const viableWin = (!result) && (squares[a]) && (squares[a] === squares[b]) && (squares[a] === squares[c]);
-    //If line wins, return winning char, otherwise return previous result.
-    return viableWin?squares[a]:result;
-  }, null);
+  /*
+  * Check if line [a, b, c] is won.
+  * i.e. squares are not empty and are all the same character.
+  */
+  const lineIsWin = (a, b, c) => {
+    return (squares[a]) && (squares[a] === squares[b]) && (squares[a] === squares[c])
+  }
 
-  return winChar;
+  /*
+  * Check if line [a ,b c] can not be won by either player.
+  * i.e. 'X' and 'O' both appear in line.
+  */
+  const lineIsDraw = (a, b, c) => {
+    const xPresent = (squares[a] === 'X') || (squares[b] === 'X') || (squares[c] === 'X');
+    const oPresent = (squares[a] === 'O') || (squares[b] === 'O') || (squares[c] === 'O');
+    return (xPresent && oPresent);
+  }
+
+  /*
+  * winChar is 'X' or 'O' if that char has won the game, or null otherwise. Null by default.
+  * draw is TRUE if game can not be won by either player. TRUE by default.
+  * Note that function does not catch all stalemate states. Needs revision.
+  */
+  const [winChar, draw] =  lines.reduce((result, line) => {
+    const [a, b, c] = line;
+
+    /*
+    * If winner already found (winChar previously not null), retain previous result.
+    * Otherwise check line and return 'X','O', or null.
+    */
+    const lineWon = result[0] ?
+      result[0] :
+      lineIsWin(a, b, c) ? 
+        squares[a] :
+        null;
+
+    /*
+    * If win already possible (stalemate previously FALSE), retain FALSE.
+    * Otherwise check line and return TRUE or FALSE.
+    */
+    const lineDrawn = !result[1] ? false : lineIsDraw(a, b, c);
+
+    return [lineWon, lineDrawn];
+  }, [null, true]);
+
+  return draw ? 'D' : winChar;
 }
 
-//Helper function for debugging.
+/*
+* Helper function for debugging.
+* Write history array to console, formatted for readability.
+*/
 const logHistory = (history) => { 
   const completeMessage = history.reduce((messageRows, turnObject, turnNum) => {
     const messageSquares = turnObject.squares.reduce((messageSquares, square) => {
